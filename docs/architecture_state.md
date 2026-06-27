@@ -13,13 +13,38 @@ The system is currently composed of a single backend service.
 
 A Python-based web service built with the FastAPI framework.
 
-- **`app/main.py`**: The main entry point of the application. It instantiates the FastAPI app and will define the API endpoints.
+- **`app/main.py`**: The main entry point of the application. It instantiates the FastAPI app and defines the API endpoints.
 - **`app/models.py`**: Defines the data contracts for the application using Pydantic models. This ensures strict data validation at the API boundary.
 - **`app/store.py`**: Implements the in-memory data storage for tasks. It encapsulates all data manipulation logic.
 - **`Dockerfile`**: A multi-stage Dockerfile that containerizes the Python application for deployment. It is configured to be compatible with Google Cloud Run, including listening on `0.0.0.0` and respecting the `PORT` environment variable.
 - **`requirements.txt`**: A file that pins all Python dependencies for reproducible builds.
 
 ## Public Interfaces
+
+### Task Management API
+
+- **Endpoint**: `GET /tasks/`
+  - **Description**: Retrieve all tasks.
+  - **Response (200 OK)**: `list[Task]`
+
+- **Endpoint**: `POST /tasks/`
+  - **Description**: Create a new task.
+  - **Request Body**: `TaskCreate`
+  - **Response (201 Created)**: `Task`
+  - **Response (422 Unprocessable Entity)**: If request body validation fails.
+
+- **Endpoint**: `PATCH /tasks/{task_id}`
+  - **Description**: Update a task's completion status.
+  - **Path Parameter**: `task_id: UUID`
+  - **Request Body**: `TaskUpdate`
+  - **Response (200 OK)**: `Task`
+  - **Response (404 Not Found)**: If `task_id` does not exist.
+
+- **Endpoint**: `DELETE /tasks/{task_id}`
+  - **Description**: Delete a task.
+  - **Path Parameter**: `task_id: UUID`
+  - **Response (204 No Content)**: On successful deletion.
+  - **Response (404 Not Found)**: If `task_id` does not exist.
 
 ### Health Check API
 
@@ -63,6 +88,8 @@ These are system-wide constraints that must be maintained in all future developm
 
 - **In-Memory Store Capacity**: The task store must not hold more than 1,000 tasks simultaneously.
 - **Data Validation**: The `description` field for a task must have a minimum length of 1 and a maximum length of 256 characters, enforced by the Pydantic model.
-- **Statelessness**: The application must remain stateless to support horizontal scaling in environments like Google Cloud Run. All state will eventually be managed externally (or, for this simple case, kept in-memory per instance, understanding its ephemeral nature).
+- **Statelessness**: The application must remain stateless to support horizontal scaling in environments like Google Cloud Run. All state is kept in-memory per instance, understanding its ephemeral nature.
 - **Configuration**: The application must be configurable via environment variables (`PORT`) but must also provide safe default values to run without explicit configuration.
 - **Deployability**: The service must adhere to the contract for its target deployment environment (Google Cloud Run), specifically regarding port binding and health checks.
+- **Performance**: P95 latency for `POST /tasks/`, `PATCH /tasks/{task_id}`, and `DELETE /tasks/{task_id}` must be less than 200ms. P95 latency for `GET /tasks/` with up to 100 items must be less than 300ms.
+- **Reliability**: The error rate for all API endpoints must be below 0.1%.

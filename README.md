@@ -1,12 +1,12 @@
 # Simple Task Tracker
 
-A full-stack task management application with a FastAPI backend and a React frontend. It provides a simple interface to create, track, and manage tasks.
+A full-stack task management application with a FastAPI backend and a React frontend. It provides a simple API to create, track, and manage tasks.
 
 ## Features
+- RESTful API for full CRUD (Create, Read, Update, Delete) operations on tasks.
 - FastAPI backend service with a health check endpoint.
 - In-memory data store for managing tasks.
 - Containerized setup using Docker for consistent deployment.
-- (Planned) Full CRUD API endpoints for tasks.
 - (Planned) React-based frontend for user interaction.
 
 ## Tech Stack
@@ -33,9 +33,36 @@ python -m compileall -q -x '(^|/)\.sdlc_deps(/|$)' .
 ```
 
 ## Usage
+First, start the development server from the project root:
 ```sh
 # From the project root directory, run the development server
 uvicorn backend.app.main:app --host 0.0.0.0 --port 8080 --reload
+```
+
+Then, interact with the API endpoints using a tool like `curl`:
+
+```sh
+# Create a new task
+curl -X 'POST' \
+  'http://localhost:8080/tasks/' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "description": "Learn FastAPI"
+}'
+
+# Get all tasks
+curl http://localhost:8080/tasks/
+
+# Update a task (replace {task_id} with a real ID from the GET response)
+curl -X 'PATCH' \
+  'http://localhost:8080/tasks/{task_id}' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "completed": true
+}'
+
+# Delete a task (replace {task_id} with a real ID)
+curl -X 'DELETE' 'http://localhost:8080/tasks/{task_id}'
 ```
 
 ## Running Tests

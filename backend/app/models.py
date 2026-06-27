@@ -1,5 +1,6 @@
 import uuid
 from pydantic import BaseModel, Field, ConfigDict
+from pydantic.types import StrictBool
 
 
 class Task(BaseModel):
@@ -15,4 +16,5 @@ class TaskCreate(BaseModel):
 
 
 class TaskUpdate(BaseModel):
-    completed: bool
+    model_config = ConfigDict(strict=True)
+    completed: StrictBool
