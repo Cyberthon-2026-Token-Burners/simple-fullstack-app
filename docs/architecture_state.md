@@ -26,12 +26,13 @@ A React-based single-page application (SPA) built with Vite that provides the us
 - **`package.json`**: Defines Node.js project metadata, dependencies (`react`, `axios`), development dependencies (`vite`, `vitest`), and scripts (`dev`, `build`, `test`).
 - **`vite.config.js`**: Vite configuration file. It includes a proxy setup to forward API requests from `/api` to the backend service at `http://localhost:8000` during local development, mitigating CORS issues.
 - **`src/App.jsx`**: The root component of the React application.
+- **`src/api/taskService.js`**: The API service module that centralizes all HTTP communication with the backend. It encapsulates data fetching logic, providing a clean interface for UI components.
 - **`Dockerfile`**: A multi-stage `Dockerfile` that first builds the static React assets in a Node.js environment and then serves them from a lightweight Nginx container, creating an optimized and secure production image.
 - **`nginx.conf`**: Nginx configuration to serve the SPA. It correctly handles client-side routing by directing all requests to `index.html`.
 
 ## Public Interfaces
 
-### Task Management API
+### Backend API
 
 - **Endpoint**: `GET /tasks/`
   - **Description**: Retrieve all tasks.
@@ -67,6 +68,15 @@ A React-based single-page application (SPA) built with Vite that provides the us
   }
   ```
 
+### Frontend Service Interface (`taskService.js`)
+
+The `taskService` module provides a programmatic interface for UI components to interact with the backend API.
+
+- **`getTasks(): Promise<Task[]>`**: Fetches all tasks.
+- **`createTask(description: string): Promise<Task>`**: Creates a new task with the given description.
+- **`updateTask(taskId: string, completed: boolean): Promise<Task>`**: Updates a task's completion status.
+- **`deleteTask(taskId: string): Promise<void>`**: Deletes a task by its ID.
+
 ### Data Layer Interface
 
 #### Data Models (`app.models`)
@@ -88,6 +98,7 @@ A React-based single-page application (SPA) built with Vite that provides the us
 
 ## Design Patterns
 
+- **API Service Layer**: The frontend implements an API service layer (`taskService.js`) to decouple UI components from the specifics of data fetching. This centralizes API logic, making it easier to manage, test, and adapt to backend changes.
 - **Single Page Application (SPA)**: The frontend is a SPA, providing a fluid user experience by dynamically rewriting the current page rather than loading entire new pages from the server.
 - **Component-Based Architecture**: The UI is built using React, which promotes breaking down the interface into reusable, independent components.
 - **Multi-Stage Docker Build**: Both backend and frontend services use multi-stage builds to create lean and secure production images, separating build-time dependencies from the runtime environment.
