@@ -1,74 +1,90 @@
 # Simple Task Tracker
 
-A full-stack task management application with a FastAPI backend and a React frontend. It provides a simple API to create, track, and manage tasks.
+A full-stack task management application with a FastAPI backend and a React frontend. It provides a simple API and UI to create, track, and manage tasks.
 
 ## Features
 - RESTful API for full CRUD (Create, Read, Update, Delete) operations on tasks.
-- FastAPI backend service with a health check endpoint.
-- In-memory data store for managing tasks.
-- Containerized setup using Docker for consistent deployment.
-- (Planned) React-based frontend for user interaction.
+- React-based frontend for user interaction.
+- Vite-powered development environment with Hot Module Replacement (HMR).
+- Containerized setup using Docker for consistent deployment of both frontend and backend.
 
 ## Tech Stack
+
+### Backend
 - Python `3.12`
 - FastAPI `0.111.0`
 - Pydantic `2.7.4`
 - Uvicorn `0.30.1`
-- pytest `8.2.2`
-- httpx `0.27.0`
+
+### Frontend
+- Node.js `22.x`
+- React `18.3.1`
+- Vite `5.3.1`
+- Axios `1.7.2`
+- Nginx `1.27` (for serving)
 
 ## Getting Started
 
 ### Prerequisites
-- Python `3.12`
-- pip (Python package installer)
+- Python `3.12` & pip
+- Node.js `22.x` & npm
 
 ### Installation & Build
+
+#### Backend
 ```sh
-# Install backend dependencies
+# From the project root, install backend dependencies
 pip install --target=/workspace/.sdlc_deps -r backend/requirements.txt 2>/dev/null || true
 
 # Verify compilation (optional)
 python -m compileall -q -x '(^|/)\.sdlc_deps(/|$)' .
 ```
 
+#### Frontend
+```sh
+# From the project root, navigate to the frontend directory
+cd frontend
+
+# Install frontend dependencies
+npm ci || npm install
+
+# Build for production
+npm run build --if-present
+```
+
 ## Usage
+
+#### Backend
 First, start the development server from the project root:
 ```sh
 # From the project root directory, run the development server
-uvicorn backend.app.main:app --host 0.0.0.0 --port 8080 --reload
+uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-Then, interact with the API endpoints using a tool like `curl`:
-
+#### Frontend
+In a separate terminal, start the frontend development server:
 ```sh
-# Create a new task
-curl -X 'POST' \
-  'http://localhost:8080/tasks/' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "description": "Learn FastAPI"
-}'
+# From the project root, navigate to the frontend directory
+cd frontend
 
-# Get all tasks
-curl http://localhost:8080/tasks/
-
-# Update a task (replace {task_id} with a real ID from the GET response)
-curl -X 'PATCH' \
-  'http://localhost:8080/tasks/{task_id}' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "completed": true
-}'
-
-# Delete a task (replace {task_id} with a real ID)
-curl -X 'DELETE' 'http://localhost:8080/tasks/{task_id}'
+# Start the Vite development server
+npm run dev
 ```
+The frontend will be available at `http://localhost:5173` by default, with API requests proxied to the backend at `http://localhost:8000`.
 
 ## Running Tests
+
+#### Backend
 ```sh
-# Run the test suite from the project root directory
+# Run the backend test suite from the project root directory
 python -m pytest
+```
+
+#### Frontend
+```sh
+# From the frontend/ directory, run the frontend tests
+cd frontend
+npm test
 ```
 
 ## License

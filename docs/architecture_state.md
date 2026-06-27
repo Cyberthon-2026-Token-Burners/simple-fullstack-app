@@ -7,7 +7,7 @@ This document records the architecture of the Simple Task Tracker application. I
 
 ## Active Components
 
-The system is currently composed of a single backend service.
+The system is composed of two primary services: a backend API and a frontend web application.
 
 ### 1. Backend Service (`backend/`)
 
@@ -18,6 +18,16 @@ A Python-based web service built with the FastAPI framework.
 - **`app/store.py`**: Implements the in-memory data storage for tasks. It encapsulates all data manipulation logic.
 - **`Dockerfile`**: A multi-stage Dockerfile that containerizes the Python application for deployment. It is configured to be compatible with Google Cloud Run, including listening on `0.0.0.0` and respecting the `PORT` environment variable.
 - **`requirements.txt`**: A file that pins all Python dependencies for reproducible builds.
+
+### 2. Frontend Service (`frontend/`)
+
+A React-based single-page application (SPA) built with Vite that provides the user interface for the task tracker.
+
+- **`package.json`**: Defines Node.js project metadata, dependencies (`react`, `axios`), development dependencies (`vite`, `vitest`), and scripts (`dev`, `build`, `test`).
+- **`vite.config.js`**: Vite configuration file. It includes a proxy setup to forward API requests from `/api` to the backend service at `http://localhost:8000` during local development, mitigating CORS issues.
+- **`src/App.jsx`**: The root component of the React application.
+- **`Dockerfile`**: A multi-stage `Dockerfile` that first builds the static React assets in a Node.js environment and then serves them from a lightweight Nginx container, creating an optimized and secure production image.
+- **`nginx.conf`**: Nginx configuration to serve the SPA. It correctly handles client-side routing by directing all requests to `index.html`.
 
 ## Public Interfaces
 
@@ -78,6 +88,9 @@ A Python-based web service built with the FastAPI framework.
 
 ## Design Patterns
 
+- **Single Page Application (SPA)**: The frontend is a SPA, providing a fluid user experience by dynamically rewriting the current page rather than loading entire new pages from the server.
+- **Component-Based Architecture**: The UI is built using React, which promotes breaking down the interface into reusable, independent components.
+- **Multi-Stage Docker Build**: Both backend and frontend services use multi-stage builds to create lean and secure production images, separating build-time dependencies from the runtime environment.
 - **Singleton**: The `TaskStore` in `backend/app/store.py` is implemented as a singleton instance (`TASK_STORE`). This ensures that a single, shared in-memory database is used throughout the application lifecycle.
 - **Application Factory**: The `create_app()` function in `backend/app/main.py` is used to create and configure the FastAPI application instance. This pattern facilitates testing by allowing the creation of isolated app instances for different test scenarios.
 - **Containerization**: The backend service is designed to run as a container, abstracting away the underlying host environment and ensuring consistency from development to production.
@@ -86,10 +99,12 @@ A Python-based web service built with the FastAPI framework.
 
 These are system-wide constraints that must be maintained in all future development.
 
-- **In-Memory Store Capacity**: The task store must not hold more than 1,000 tasks simultaneously.
+- **Development Environment Parity**: The Vite development server's proxy must be configured to mimic the production environment's API routing, forwarding `/api` requests to the backend service.
+- **Build Reproducibility**: Frontend dependencies are pinned in `frontend/package-lock.json` to ensure deterministic builds.
+- **In-Memory Store Capacity**: The backend task store must not hold more than 1,000 tasks simultaneously.
 - **Data Validation**: The `description` field for a task must have a minimum length of 1 and a maximum length of 256 characters, enforced by the Pydantic model.
-- **Statelessness**: The application must remain stateless to support horizontal scaling in environments like Google Cloud Run. All state is kept in-memory per instance, understanding its ephemeral nature.
-- **Configuration**: The application must be configurable via environment variables (`PORT`) but must also provide safe default values to run without explicit configuration.
-- **Deployability**: The service must adhere to the contract for its target deployment environment (Google Cloud Run), specifically regarding port binding and health checks.
+- **Statelessness**: The backend application must remain stateless to support horizontal scaling. All state is kept in-memory per instance, understanding its ephemeral nature.
+- **Configuration**: The backend application must be configurable via environment variables (`PORT`) but must also provide safe default values.
+- **Deployability**: The services must adhere to the contracts for their target deployment environments, including port binding and health checks.
 - **Performance**: P95 latency for `POST /tasks/`, `PATCH /tasks/{task_id}`, and `DELETE /tasks/{task_id}` must be less than 200ms. P95 latency for `GET /tasks/` with up to 100 items must be less than 300ms.
 - **Reliability**: The error rate for all API endpoints must be below 0.1%.

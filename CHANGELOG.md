@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Scaffolded the React frontend application using Vite, including a development server proxy and a multi-stage Dockerfile for production builds with Nginx.
 - Implemented full CRUD API endpoints for tasks: `GET /tasks/`, `POST /tasks/`, `PATCH /tasks/{task_id}`, and `DELETE /tasks/{task_id}`.
 - Pydantic data models for tasks (`Task`, `TaskCreate`, `TaskUpdate`).
 - A singleton in-memory `TaskStore` for CRUD operations on tasks, with a capacity limit of 1000 tasks.
