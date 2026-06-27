@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Implemented full CRUD API endpoints for tasks: `GET /tasks/`, `POST /tasks/`, `PATCH /tasks/{task_id}`, and `DELETE /tasks/{task_id}`.
 - Pydantic data models for tasks (`Task`, `TaskCreate`, `TaskUpdate`).
 - A singleton in-memory `TaskStore` for CRUD operations on tasks, with a capacity limit of 1000 tasks.
 - Initial scaffolding for the FastAPI backend application.
