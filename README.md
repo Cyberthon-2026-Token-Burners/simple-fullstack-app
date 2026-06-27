@@ -4,13 +4,15 @@ A full-stack task management application with a FastAPI backend and a React fron
 
 ## Features
 - FastAPI backend service with a health check endpoint.
+- In-memory data store for managing tasks.
 - Containerized setup using Docker for consistent deployment.
-- (Planned) Full CRUD functionality for tasks.
+- (Planned) Full CRUD API endpoints for tasks.
 - (Planned) React-based frontend for user interaction.
 
 ## Tech Stack
 - Python `3.12`
 - FastAPI `0.111.0`
+- Pydantic `2.7.4`
 - Uvicorn `0.30.1`
 - pytest `8.2.2`
 - httpx `0.27.0`
