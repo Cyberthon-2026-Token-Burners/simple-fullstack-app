@@ -13,7 +13,9 @@ The system is currently composed of a single backend service.
 
 A Python-based web service built with the FastAPI framework.
 
-- **`app/main.py`**: The main entry point of the application. It instantiates the FastAPI app and defines the API endpoints.
+- **`app/main.py`**: The main entry point of the application. It instantiates the FastAPI app and will define the API endpoints.
+- **`app/models.py`**: Defines the data contracts for the application using Pydantic models. This ensures strict data validation at the API boundary.
+- **`app/store.py`**: Implements the in-memory data storage for tasks. It encapsulates all data manipulation logic.
 - **`Dockerfile`**: A multi-stage Dockerfile that containerizes the Python application for deployment. It is configured to be compatible with Google Cloud Run, including listening on `0.0.0.0` and respecting the `PORT` environment variable.
 - **`requirements.txt`**: A file that pins all Python dependencies for reproducible builds.
 
@@ -30,8 +32,28 @@ A Python-based web service built with the FastAPI framework.
   }
   ```
 
+### Data Layer Interface
+
+#### Data Models (`app.models`)
+- **`Task`**: The core representation of a task.
+  - `id: UUID` (read-only)
+  - `description: str`
+  - `completed: bool`
+- **`TaskCreate`**: The model for creating a new task.
+  - `description: str` (1-256 characters)
+- **`TaskUpdate`**: The model for updating a task's status.
+  - `completed: bool`
+
+#### In-Memory Store (`app.store.TASK_STORE`)
+- **`get_all() -> List[Task]`**: Retrieves all tasks.
+- **`get_by_id(task_id: UUID) -> Optional[Task]`**: Retrieves a single task.
+- **`create(description: str) -> Task`**: Creates and stores a new task.
+- **`update(task_id: UUID, completed: bool) -> Optional[Task]`**: Updates a task's completion status.
+- **`delete(task_id: UUID) -> Optional[Task]`**: Removes a task from the store.
+
 ## Design Patterns
 
+- **Singleton**: The `TaskStore` in `backend/app/store.py` is implemented as a singleton instance (`TASK_STORE`). This ensures that a single, shared in-memory database is used throughout the application lifecycle.
 - **Application Factory**: The `create_app()` function in `backend/app/main.py` is used to create and configure the FastAPI application instance. This pattern facilitates testing by allowing the creation of isolated app instances for different test scenarios.
 - **Containerization**: The backend service is designed to run as a container, abstracting away the underlying host environment and ensuring consistency from development to production.
 
@@ -39,6 +61,8 @@ A Python-based web service built with the FastAPI framework.
 
 These are system-wide constraints that must be maintained in all future development.
 
+- **In-Memory Store Capacity**: The task store must not hold more than 1,000 tasks simultaneously.
+- **Data Validation**: The `description` field for a task must have a minimum length of 1 and a maximum length of 256 characters, enforced by the Pydantic model.
 - **Statelessness**: The application must remain stateless to support horizontal scaling in environments like Google Cloud Run. All state will eventually be managed externally (or, for this simple case, kept in-memory per instance, understanding its ephemeral nature).
 - **Configuration**: The application must be configurable via environment variables (`PORT`) but must also provide safe default values to run without explicit configuration.
 - **Deployability**: The service must adhere to the contract for its target deployment environment (Google Cloud Run), specifically regarding port binding and health checks.
