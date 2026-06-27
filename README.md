@@ -5,6 +5,7 @@ A full-stack task management application with a FastAPI backend and a React fron
 ## Features
 - RESTful API for full CRUD (Create, Read, Update, Delete) operations on tasks.
 - React-based frontend for user interaction.
+- Modular UI components for displaying, adding, and managing tasks.
 - Decoupled API service layer for robust frontend-backend communication.
 - Vite-powered development environment with Hot Module Replacement (HMR).
 - Containerized setup using Docker for consistent deployment of both frontend and backend.
@@ -27,65 +28,22 @@ A full-stack task management application with a FastAPI backend and a React fron
 ## Getting Started
 
 ### Prerequisites
-- Python `3.12` & pip
 - Node.js `22.x` & npm
 
 ### Installation & Build
-
-#### Backend
 ```sh
-# From the project root, install backend dependencies
-pip install --target=/workspace/.sdlc_deps -r backend/requirements.txt 2>/dev/null || true
-
-# Verify compilation (optional)
-python -m compileall -q -x '(^|/)\.sdlc_deps(/|$)' .
-```
-
-#### Frontend
-```sh
-# From the project root, navigate to the frontend directory
-cd frontend
-
-# Install frontend dependencies
 npm ci || npm install
-
-# Build for production
 npm run build --if-present
 ```
 
 ## Usage
-
-#### Backend
-First, start the development server from the project root:
 ```sh
-# From the project root directory, run the development server
-uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --reload
+CI=true npm test
 ```
-
-#### Frontend
-In a separate terminal, start the frontend development server:
-```sh
-# From the project root, navigate to the frontend directory
-cd frontend
-
-# Start the Vite development server
-npm run dev
-```
-The frontend will be available at `http://localhost:5173` by default, with API requests proxied to the backend at `http://localhost:8000`.
 
 ## Running Tests
-
-#### Backend
 ```sh
-# Run the backend test suite from the project root directory
-python -m pytest
-```
-
-#### Frontend
-```sh
-# From the frontend/ directory, run the frontend tests
-cd frontend
-npm test
+CI=true npm test
 ```
 
 ## License

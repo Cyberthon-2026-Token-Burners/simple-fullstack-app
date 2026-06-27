@@ -27,6 +27,10 @@ A React-based single-page application (SPA) built with Vite that provides the us
 - **`vite.config.js`**: Vite configuration file. It includes a proxy setup to forward API requests from `/api` to the backend service at `http://localhost:8000` during local development, mitigating CORS issues.
 - **`src/App.jsx`**: The root component of the React application.
 - **`src/api/taskService.js`**: The API service module that centralizes all HTTP communication with the backend. It encapsulates data fetching logic, providing a clean interface for UI components.
+- **`src/components/`**: The directory for reusable, presentational UI components.
+    - **`AddTaskForm.jsx`**: A form component for user input to create a new task. It is stateless and emits a creation event via a prop function.
+    - **`TaskItem.jsx`**: A component that displays a single task's details. It is stateless and emits update/delete events for that task via prop functions.
+    - **`TaskList.jsx`**: A component that renders a list of `TaskItem` components by iterating over a tasks array passed via props.
 - **`Dockerfile`**: A multi-stage `Dockerfile` that first builds the static React assets in a Node.js environment and then serves them from a lightweight Nginx container, creating an optimized and secure production image.
 - **`nginx.conf`**: Nginx configuration to serve the SPA. It correctly handles client-side routing by directing all requests to `index.html`.
 
@@ -100,7 +104,7 @@ The `taskService` module provides a programmatic interface for UI components to 
 
 - **API Service Layer**: The frontend implements an API service layer (`taskService.js`) to decouple UI components from the specifics of data fetching. This centralizes API logic, making it easier to manage, test, and adapt to backend changes.
 - **Single Page Application (SPA)**: The frontend is a SPA, providing a fluid user experience by dynamically rewriting the current page rather than loading entire new pages from the server.
-- **Component-Based Architecture**: The UI is built using React, which promotes breaking down the interface into reusable, independent components.
+- **Component-Based Architecture**: The UI is built using React, which promotes breaking down the interface into reusable, independent components. This project uses a clear separation between container components (which manage state and logic) and presentational components (`AddTaskForm`, `TaskItem`, `TaskList`), which are stateless and receive data and callbacks as props. This promotes unidirectional data flow.
 - **Multi-Stage Docker Build**: Both backend and frontend services use multi-stage builds to create lean and secure production images, separating build-time dependencies from the runtime environment.
 - **Singleton**: The `TaskStore` in `backend/app/store.py` is implemented as a singleton instance (`TASK_STORE`). This ensures that a single, shared in-memory database is used throughout the application lifecycle.
 - **Application Factory**: The `create_app()` function in `backend/app/main.py` is used to create and configure the FastAPI application instance. This pattern facilitates testing by allowing the creation of isolated app instances for different test scenarios.
