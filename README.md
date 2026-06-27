@@ -5,6 +5,7 @@ A full-stack task management application with a FastAPI backend and a React fron
 ## Features
 - RESTful API for full CRUD (Create, Read, Update, Delete) operations on tasks.
 - React-based frontend for user interaction.
+- Decoupled API service layer for robust frontend-backend communication.
 - Vite-powered development environment with Hot Module Replacement (HMR).
 - Containerized setup using Docker for consistent deployment of both frontend and backend.
 
